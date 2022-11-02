@@ -37,7 +37,7 @@ public class CreateTimeDayTableShardingAlgorithm
 			start = valueRange.lowerEndpoint().toLocalDateTime();
 		}
 		catch (Exception e) {
-			start = LocalDateTime.now().minusDays(15L);
+			start = LocalDateTime.now();
 		}
 		LocalDateTime end = null;
 		try {
@@ -58,9 +58,8 @@ public class CreateTimeDayTableShardingAlgorithm
 				if (availableTargetNames.contains(name + "_" + startName)) {
 					suffixList.add(name + "_" + startName);
 				}
-				start = start.plusDays(1L);
+				start = start.plusYears(1L);
 				startName = DateUtil.format(start, FORMAT_LINK_DAY);
-
 			}
 			if (availableTargetNames.contains(name + "_" + endName)) {
 				suffixList.add(name + "_" + endName);
