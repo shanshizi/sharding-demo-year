@@ -1,0 +1,44 @@
+server:
+  port: 8088
+
+spring:
+  shardingsphere:
+    datasource:
+      names: db0
+      db0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/xxx?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&autoReconnect=true&failOverReadOnly=false
+        username: root
+        password: xxx
+    rules:
+      sharding:
+        tables:
+          m:
+            actual-data-nodes: db0.m_${"2022"}
+            table-strategy:
+              standard:
+                sharding-column: create_time
+                shardingAlgorithmName: createtime-day
+        sharding-algorithms:
+          createtime-day:
+            type: CLASS_BASED
+            props:
+              strategy: STANDARD
+              algorithmClassName: com.ssz.shardingdemo.config.sharding.CreateTimeDayTableShardingAlgorithm
+    props:
+      sql-show: true
+
+# mybatis-plus相关配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*Mapper.xml
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-not-delete-value: 0
+      logic-delete-value: "NOW()" #逻辑删除值改为当前时间戳
+
