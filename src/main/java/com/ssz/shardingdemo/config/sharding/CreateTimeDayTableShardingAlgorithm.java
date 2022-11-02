@@ -4,11 +4,13 @@ import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Range;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shardingsphere.sharding.api.sharding.standard.PreciseShardingValue;
 import org.apache.shardingsphere.sharding.api.sharding.standard.RangeShardingValue;
 import org.apache.shardingsphere.sharding.api.sharding.standard.StandardShardingAlgorithm;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -22,6 +24,8 @@ public class CreateTimeDayTableShardingAlgorithm
 		implements StandardShardingAlgorithm<Timestamp>, CreateTimeShardingAlgorithm {
 
 	private static final String FORMAT_LINK_DAY = "yyyy";
+
+	private final static Integer Count = 2;
 
 	@Override
 	public Collection<String> doSharding(Collection<String> availableTargetNames,
@@ -107,4 +111,17 @@ public class CreateTimeDayTableShardingAlgorithm
 		return date+1;
 	}
 
+	@Override
+	public String buildNodes(String tableName, Integer year) {
+		Integer date = year;
+		List<String> tableNameList = new ArrayList<>();
+		LocalDate today = LocalDate.now();
+		Integer currentYear = today.getYear();
+		Integer ct = currentYear+(Count+1)-year;
+		for (int i = 0; i < ct; i++) {
+			tableNameList.add("db0." + tableName + "_${'" + buildNodesSuffix(date) + "'}");
+			date = buildNodesAfterDate(date);
+		}
+		return StringUtils.join(tableNameList, ",");
+	}
 }

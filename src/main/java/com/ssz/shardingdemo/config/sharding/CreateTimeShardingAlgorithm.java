@@ -46,18 +46,7 @@ public interface CreateTimeShardingAlgorithm {
 	 * @param year 最初的表，用来计算物理表数
 	 * @return 物理表的集合，用，号拼接
 	 */
-	default String buildNodes(String tableName, Integer year) {
-		Integer date = year;
-		List<String> tableNameList = new ArrayList<>();
-		LocalDate today = LocalDate.now();
-		Integer currentYear = today.getYear()+2+1;
-		Integer ct = currentYear-year;
-		for (int i = 0; i < ct; i++) {
-			tableNameList.add("db0." + tableName + "_${'" + buildNodesSuffix(date) + "'}");
-			date = buildNodesAfterDate(date);
-		}
-		return StringUtils.join(tableNameList, ",");
-	}
+	String buildNodes(String tableName, Integer year);
 
 	default void createTables(ShardingSphereDataSource dataSource, String tableName, Integer count) {
 
